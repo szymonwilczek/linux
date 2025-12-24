@@ -878,7 +878,8 @@ int dtInsert(tid_t tid, struct inode *ip,
 	/*
 	 * acquire a transaction lock on the leaf page
 	 */
-	tlck = txLock(tid, ip, mp, tlckDTREE | tlckENTRY);
+	tlck = txLock(tid, ip, mp, tlckDTREE | tlckENTRY |
+		      (BT_IS_ROOT(mp) ? tlckBTROOT : 0));
 	dtlck = (struct dt_lock *) & tlck->lock;
 	ASSERT(dtlck->index == 0);
 	lv = & dtlck->lv[0];
@@ -1255,7 +1256,8 @@ static int dtSplitUp(tid_t tid,
 			/*
 			 * acquire a transaction lock on the parent page
 			 */
-			tlck = txLock(tid, ip, smp, tlckDTREE | tlckENTRY);
+			tlck = txLock(tid, ip, smp, tlckDTREE | tlckENTRY |
+				      (BT_IS_ROOT(smp) ? tlckBTROOT : 0));
 			dtlck = (struct dt_lock *) & tlck->lock;
 			ASSERT(dtlck->index == 0);
 			lv = & dtlck->lv[0];
@@ -2158,7 +2160,8 @@ int dtDelete(tid_t tid,
 		/*
 		 * acquire a transaction lock on the leaf page
 		 */
-		tlck = txLock(tid, ip, mp, tlckDTREE | tlckENTRY);
+		tlck = txLock(tid, ip, mp, tlckDTREE | tlckENTRY |
+		      (BT_IS_ROOT(mp) ? tlckBTROOT : 0));
 		dtlck = (struct dt_lock *) & tlck->lock;
 
 		/*
@@ -2380,7 +2383,8 @@ static int dtDeleteUp(tid_t tid, struct inode *ip,
 		 *
 		 * action: router entry deletion
 		 */
-		tlck = txLock(tid, ip, mp, tlckDTREE | tlckENTRY);
+		tlck = txLock(tid, ip, mp, tlckDTREE | tlckENTRY |
+			      (BT_IS_ROOT(mp) ? tlckBTROOT : 0));
 		dtlck = (struct dt_lock *) & tlck->lock;
 
 		/* linelock header */
