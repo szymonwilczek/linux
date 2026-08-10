@@ -1,168 +1,66 @@
-Linux kernel
-============
+Kernel Contributions
+====================
 
-The Linux kernel is the core of any Linux operating system. It manages hardware,
-system resources, and provides the fundamental services for all other software.
+My staging ground for Linux kernel contributions. Contains patches and reproducers 
+for upstream bug fixes, focused on USB/CAN subsystems and memory safety issues 
+found by Syzbot.
 
-Quick Start
------------
+This repository tracks my contributions to the Linux Kernel mainline. It contains 
+development branches for bug fixes (memory leaks, concurrency issues) identified 
+via Syzbot/KASAN, along with verification logic and reproductions.
 
-* Report a bug: See Documentation/admin-guide/reporting-issues.rst
-* Get the latest kernel: https://kernel.org
-* Build the kernel: See Documentation/admin-guide/quickly-build-trimmed-linux.rst
-* Join the community: https://lore.kernel.org/
+Patches
+--------------------------
+*  dma-buf: fix WARNING in dma_buf_vmap
+Link: https://lore.kernel.org/all/20251221153250.17591-1-swilczek.lx@gmail.com/T/
+Description: Fixed incorrect WARN_ON usage when vmap fails legitimately.
 
-Essential Documentation
------------------------
+*  wifi: libertas: fix WARNING in usb_tx_block
+Link: https://lore.kernel.org/all/20251221155806.23925-1-swilczek.lx@gmail.com/T/
+Description: Fixed race condition where URB was submitted while active.
 
-All users should be familiar with:
+*  can: etas_es58x: allow partial RX URB allocation to succeed
+Link: https://lore.kernel.org/all/20251222154208.22117-1-swilczek.lx@gmail.com/T/
+Description: Improved driver resilience by handling partial allocation instead of leaking memory.
 
-* Building requirements: Documentation/process/changes.rst
-* Code of Conduct: Documentation/process/code-of-conduct.rst
-* License: See COPYING
+*  media: pvrusb2: fix URB leak in pvr2_send_request_ex
+Link: https://lore.kernel.org/all/20251220182419.390675-1-szymonwilczek@gmx.com/T/
+Description: Fixed URB leak on read failure by unlinking write URB.
 
-Documentation can be built with make htmldocs or viewed online at:
-https://www.kernel.org/doc/html/latest/
+*  media: dtv5100: fix BOGUS control dir warning on 0-length reads
+Link: https://lore.kernel.org/all/20251221171542.47748-1-swilczek.lx@gmail.com/T/
+Description: Fixed protocol violation warning by using correct pipe direction for 0-length reads.
 
+*  fs/ntfs3: fix deadlock in ni_readpage_cmpr
+Link: https://lore.kernel.org/all/20251222151010.17263-1-swilczek.lx@gmail.com/T/
+Description: Resolved page lock vs inode ni_lock inversion deadlock.
 
-Who Are You?
-============
+*  KASAN: use-after-free Read in f2fs_write_end_io
+Link: https://lore.kernel.org/all/20251223162823.23606-1-swilczek.lx@gmail.com/T/
+Description: Resolved race condition between the shutdown of the filesystem and I/O completion handler.
 
-Find your role below:
+*  jfs: add missing tlckBTROOT to txLock calls on inline btree roots
+Link: https://lore.kernel.org/all/20251224233133.41078-1-swilczek.lx@gmail.com/T/
+Description: Fixed kernel BUG in txUnlock() by correctly marking inline btree roots with tlckBTROOT flag during transaction locking.
 
-* New Kernel Developer - Getting started with kernel development
-* Academic Researcher - Studying kernel internals and architecture
-* Security Expert - Hardening and vulnerability analysis
-* Backport/Maintenance Engineer - Maintaining stable kernels
-* System Administrator - Configuring and troubleshooting
-* Maintainer - Leading subsystems and reviewing patches
-* Hardware Vendor - Writing drivers for new hardware
-* Distribution Maintainer - Packaging kernels for distros
-* AI Coding Assistant - LLMs and AI-powered development tools
+*   Bluetooth: vhci: Fix slab-use-after-free by cloning skb
+Link: https://lore.kernel.org/all/20251224235407.46333-1-swilczek.lx@gmail.com/T/
+Description: Fixed UAF by cloning skb in vhci_send_frame() to isolate vhci driver from hci_core, preventing concurrent access/freeing.
 
+*   jfs: fix array-index-out-of-bounds in dtSplitPage
+Link: https://lore.kernel.org/all/20251225182852.508200-1-swilczek.lx@gmail.com/T/
+Description: Fixed OOB access by resizing struct linelock's lv array to match runtime allocation size (TLOCKLONG).
 
-For Specific Users
-==================
+*   ntfs3: fix circular locking dependency in run_unpack_ex
+Link: https://lore.kernel.org/all/20251227144307.8966-1-swilczek.lx@gmail.com/T/
+Description: Fixed AB-BA deadlock between wnd->rw_lock and ni->file.run_lock by using down_read_trylock() instead of down_read().
 
-New Kernel Developer
---------------------
+*   ocfs2: fix circular locking dependency in ocfs2_acquire_dquot
+Link: https://lore.kernel.org/all/20251227174251.121668-1-swilczek.lx@gmail.com/T/
+Description: Fixed circular dependency between sb_internal and quota locks by reordering quota file extension before acquiring global quota lock.
 
-Welcome! Start your kernel development journey here:
+---
+Verified with checkpatch.pl and local reproduction/compilation.
 
-* Getting Started: Documentation/process/development-process.rst
-* Your First Patch: Documentation/process/submitting-patches.rst
-* Coding Style: Documentation/process/coding-style.rst
-* Build System: Documentation/kbuild/index.rst
-* Development Tools: Documentation/dev-tools/index.rst
-* Kernel Hacking Guide: Documentation/kernel-hacking/hacking.rst
-* Core APIs: Documentation/core-api/index.rst
+That's just my diary, for tracking patches. Feel free to read it.
 
-Academic Researcher
--------------------
-
-Explore the kernel's architecture and internals:
-
-* Researcher Guidelines: Documentation/process/researcher-guidelines.rst
-* Memory Management: Documentation/mm/index.rst
-* Scheduler: Documentation/scheduler/index.rst
-* Networking Stack: Documentation/networking/index.rst
-* Filesystems: Documentation/filesystems/index.rst
-* RCU (Read-Copy Update): Documentation/RCU/index.rst
-* Locking Primitives: Documentation/locking/index.rst
-* Power Management: Documentation/power/index.rst
-
-Security Expert
----------------
-
-Security documentation and hardening guides:
-
-* Security Documentation: Documentation/security/index.rst
-* LSM Development: Documentation/security/lsm-development.rst
-* Self Protection: Documentation/security/self-protection.rst
-* Reporting Vulnerabilities: Documentation/process/security-bugs.rst
-* CVE Procedures: Documentation/process/cve.rst
-* Embargoed Hardware Issues: Documentation/process/embargoed-hardware-issues.rst
-* Security Features: Documentation/userspace-api/seccomp_filter.rst
-
-Backport/Maintenance Engineer
------------------------------
-
-Maintain and stabilize kernel versions:
-
-* Stable Kernel Rules: Documentation/process/stable-kernel-rules.rst
-* Backporting Guide: Documentation/process/backporting.rst
-* Applying Patches: Documentation/process/applying-patches.rst
-* Subsystem Profile: Documentation/maintainer/maintainer-entry-profile.rst
-* Git for Maintainers: Documentation/maintainer/configure-git.rst
-
-System Administrator
---------------------
-
-Configure, tune, and troubleshoot Linux systems:
-
-* Admin Guide: Documentation/admin-guide/index.rst
-* Kernel Parameters: Documentation/admin-guide/kernel-parameters.rst
-* Sysctl Tuning: Documentation/admin-guide/sysctl/index.rst
-* Tracing/Debugging: Documentation/trace/index.rst
-* Performance Security: Documentation/admin-guide/perf-security.rst
-* Hardware Monitoring: Documentation/hwmon/index.rst
-
-Maintainer
-----------
-
-Lead kernel subsystems and manage contributions:
-
-* Maintainer Handbook: Documentation/maintainer/index.rst
-* Pull Requests: Documentation/maintainer/pull-requests.rst
-* Managing Patches: Documentation/maintainer/modifying-patches.rst
-* Rebasing and Merging: Documentation/maintainer/rebasing-and-merging.rst
-* Development Process: Documentation/process/maintainer-handbooks.rst
-* Maintainer Entry Profile: Documentation/maintainer/maintainer-entry-profile.rst
-* Git Configuration: Documentation/maintainer/configure-git.rst
-
-Hardware Vendor
----------------
-
-Write drivers and support new hardware:
-
-* Driver API Guide: Documentation/driver-api/index.rst
-* Driver Model: Documentation/driver-api/driver-model/driver.rst
-* Device Drivers: Documentation/driver-api/infrastructure.rst
-* Bus Types: Documentation/driver-api/driver-model/bus.rst
-* Device Tree Bindings: Documentation/devicetree/bindings/
-* Power Management: Documentation/driver-api/pm/index.rst
-* DMA API: Documentation/core-api/dma-api.rst
-
-Distribution Maintainer
------------------------
-
-Package and distribute the kernel:
-
-* Stable Kernel Rules: Documentation/process/stable-kernel-rules.rst
-* ABI Documentation: Documentation/ABI/README
-* Kernel Configuration: Documentation/kbuild/kconfig.rst
-* Module Signing: Documentation/admin-guide/module-signing.rst
-* Kernel Parameters: Documentation/admin-guide/kernel-parameters.rst
-* Tainted Kernels: Documentation/admin-guide/tainted-kernels.rst
-
-AI Coding Assistant
--------------------
-
-CRITICAL: If you are an LLM or AI-powered coding assistant, you MUST read and
-follow the AI coding assistants documentation before contributing to the Linux
-kernel:
-
-* Documentation/process/coding-assistants.rst
-
-This documentation contains essential requirements about licensing, attribution,
-and the Developer Certificate of Origin that all AI tools must comply with.
-
-
-Communication and Support
-=========================
-
-* Mailing Lists: https://lore.kernel.org/
-* IRC: #kernelnewbies on irc.oftc.net
-* Bugzilla: https://bugzilla.kernel.org/
-* MAINTAINERS file: Lists subsystem maintainers and mailing lists
-* Email Clients: Documentation/process/email-clients.rst
